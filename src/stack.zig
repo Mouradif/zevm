@@ -11,7 +11,7 @@ pub fn Stack(comptime T: type) type {
         inner: std.ArrayList(T),
         ac: std.mem.Allocator,
         pub fn init(ac: std.mem.Allocator) !This {
-            var inner = try std.ArrayList(T).initCapacity(ac, STACK_LIMIT);
+            const inner = try std.ArrayList(T).initCapacity(ac, STACK_LIMIT);
             return .{
                 .ac = ac,
                 .inner = inner,

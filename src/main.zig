@@ -13,7 +13,7 @@ pub fn main() !void {
     // var ac = gpa.allocator();
     // defer _ = gpa.deinit();
     var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
-    var ac = arena.allocator();
+    const ac = arena.allocator();
     defer _ = arena.deinit();
 
     // TODO: Use turbopool defined in this file to go even faster.
@@ -37,7 +37,7 @@ pub fn main() !void {
     std.debug.print("input bytecode 0x{x}\n", .{
         std.fmt.fmtSliceHexLower(&bytecode),
     });
-    var mock = host.Mock.init();
+    const mock = host.Mock.init();
     var interpreter = try Interpreter.init(ac, mock.host, &bytecode);
     defer interpreter.deinit() catch std.debug.print("failed", .{});
 
@@ -95,12 +95,12 @@ pub const Interpreter = struct {
     }
     fn programCounter(self: This) usize {
         // Subtraction of pointers is safe here
-        const inst = @ptrCast(*u8, self.inst);
-        return @ptrToInt(self.bytecode.ptr - inst.*);
+        const inst: *u8 = @ptrCast(self.inst);
+        return @intFromPtr(self.bytecode.ptr - inst.*);
     }
     fn runLoop(self: *This) !void {
         while (self.inst_result == Status.Continue) {
-            const op = @ptrCast(*u8, self.inst);
+            const op: *u8 = @ptrCast(self.inst);
             std.debug.print("Running 0x{x}\n", .{op.*});
             try self.eval(op.*);
             self.stack.print();
@@ -114,8 +114,8 @@ pub const Interpreter = struct {
     }
     fn pushN(self: *This, comptime n: u8) !void {
         self.subGas(3);
-        const start = @ptrCast(*u8, self.inst + n);
-        var x = @as(u256, start.*);
+        const start: *u8 = @ptrCast(self.inst + n);
+        const x = @as(u256, start.*);
         try self.stack.push(x);
         self.inst += n;
     }
@@ -136,8 +136,8 @@ pub const Interpreter = struct {
             // Arithmetic.
             opcode.ADD => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -150,8 +150,8 @@ pub const Interpreter = struct {
             },
             opcode.MUL => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -164,8 +164,8 @@ pub const Interpreter = struct {
             },
             opcode.SUB => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -178,8 +178,8 @@ pub const Interpreter = struct {
             },
             opcode.DIV => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -195,16 +195,16 @@ pub const Interpreter = struct {
             opcode.SDIV => {},
             opcode.MOD => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 try self.stack.push(@mod(a, b));
             },
             opcode.SMOD => {},
             opcode.ADDMOD => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
-                var c = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
+                const c = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -217,9 +217,9 @@ pub const Interpreter = struct {
             },
             opcode.MULMOD => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
-                var c = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
+                const c = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -232,8 +232,8 @@ pub const Interpreter = struct {
             },
             opcode.EXP => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -247,8 +247,8 @@ pub const Interpreter = struct {
             // Comparisons.
             opcode.LT => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 if (a < b) {
                     try self.stack.push(1);
                 } else {
@@ -257,8 +257,8 @@ pub const Interpreter = struct {
             },
             opcode.GT => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 if (a > b) {
                     try self.stack.push(1);
                 } else {
@@ -267,8 +267,8 @@ pub const Interpreter = struct {
             },
             opcode.SLT => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -281,8 +281,8 @@ pub const Interpreter = struct {
             },
             opcode.SGT => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 var x = try BigInt.initSet(self.ac, a);
                 defer x.deinit();
                 var y = try BigInt.initSet(self.ac, b);
@@ -295,8 +295,8 @@ pub const Interpreter = struct {
             },
             opcode.EQ => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 if (a == b) {
                     try self.stack.push(1);
                 } else {
@@ -305,7 +305,7 @@ pub const Interpreter = struct {
             },
             opcode.ISZERO => {
                 self.subGas(5);
-                var a = self.stack.pop();
+                const a = self.stack.pop();
                 if (a == 0) {
                     try self.stack.push(1);
                 } else {
@@ -314,40 +314,40 @@ pub const Interpreter = struct {
             },
             opcode.AND => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 try self.stack.push(a & b);
             },
             opcode.OR => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 try self.stack.push(a | b);
             },
             opcode.XOR => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
+                const a = self.stack.pop();
+                const b = self.stack.pop();
                 try self.stack.push(a ^ b);
             },
             opcode.NOT => {
                 self.subGas(5);
-                var a = self.stack.pop();
+                const a = self.stack.pop();
                 try self.stack.push(~a);
             },
             opcode.BYTE => {},
             opcode.SHL => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
-                const rhs = @truncate(u8, b);
+                const a = self.stack.pop();
+                const b = self.stack.pop();
+                const rhs: u8 = @truncate(b);
                 try self.stack.push(a << rhs);
             },
             opcode.SHR => {
                 self.subGas(5);
-                var a = self.stack.pop();
-                var b = self.stack.pop();
-                const rhs = @truncate(u8, b);
+                const a = self.stack.pop();
+                const b = self.stack.pop();
+                const rhs: u8 = @truncate(b);
                 try self.stack.push(a >> rhs);
             },
             opcode.SAR => {},
@@ -375,8 +375,8 @@ pub const Interpreter = struct {
             opcode.BALANCE => {
                 // TODO: Charge host functions depending on cold results.
                 self.subGas(100);
-                var a = self.stack.pop();
-                const addr = @truncate(u160, a);
+                const a = self.stack.pop();
+                const addr: u160 = @truncate(a);
                 const result = try self.eth_host.balance(addr);
                 const balance = if (result) |r|
                     r.data
@@ -411,7 +411,7 @@ pub const Interpreter = struct {
             opcode.EXTCODEHASH => {},
             opcode.BLOCKHASH => {
                 self.subGas(100);
-                var a = self.stack.pop();
+                const a = self.stack.pop();
                 if (a > 256) {
                     // TODO: Revert instead.
                     return InterpreterError.DisallowedHostCall;
@@ -460,8 +460,8 @@ pub const Interpreter = struct {
             opcode.SSTORE => {},
             opcode.JUMP => {
                 // TODO: JUMPDEST checks.
-                self.subGas(gas.LOW);
-                var a = self.stack.pop();
+                // self.subGas(gas.LOW);
+                const a = self.stack.pop();
                 _ = a;
                 //self.inst = @ptrCast([*]u8, &@truncate(u8, a));
             },
@@ -591,7 +591,7 @@ fn TurboPool(comptime T: type) type {
             return &obj.data;
         }
         pub fn delete(self: *Self, obj: *T) void {
-            const node = @fieldParentPtr(List.Node, "data", obj);
+            const node: List.Node = @fieldParentPtr("data", obj);
             self.free.append(node);
         }
     };

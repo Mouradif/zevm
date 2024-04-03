@@ -31,6 +31,7 @@ pub const Fork = enum {
     GrayGlacier,
     Merge,
     Shanghai,
+    Dencun,
 };
 
 pub const ChainEnv = struct {
@@ -243,51 +244,51 @@ pub const Mock = struct {
     pub fn init() Mock {
         const impl = struct {
             pub fn env(ptr: *Host) HostError!Env {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.env();
             }
             pub fn loadAccount(ptr: *Host, address: Address) HostError!?AccountLoadResult {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.loadAccount(address);
             }
             pub fn blockHash(ptr: *Host, number: u256) HostError!?Hash {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.blockHash(number);
             }
             pub fn balance(ptr: *Host, address: Address) HostError!?HostResult(u256) {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.balance(address);
             }
             pub fn code(ptr: *Host) HostError!?HostResult([]u8) {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.code();
             }
             pub fn codeHash(ptr: *Host) HostError!?HostResult(Hash) {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.codeHash();
             }
             pub fn sload(ptr: *Host, address: Address, index: u256) HostError!?HostResult(u256) {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.sload(address, index);
             }
             pub fn sstore(ptr: *Host, address: Address, index: u256, value: u256) HostError!?SStoreResult {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.sstore(address, index, value);
             }
             pub fn log(ptr: *Host, address: Address, topics: []Hash, data: []u8) HostError!void {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.log(address, topics, data);
             }
             pub fn selfDestruct(ptr: *Host, address: Address, target: Address) HostError!?SelfDestructResult {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.selfDestruct(address, target);
             }
             pub fn create(ptr: *Host, inputs: CreateInputs) HostError!?CreateResult {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.create(inputs);
             }
             pub fn call(ptr: *Host, inputs: CallInputs) HostError!?CallResult {
-                const self = @fieldParentPtr(Mock, "host", ptr);
+                const self: *Mock = @fieldParentPtr("host", ptr);
                 return self.call(inputs);
             }
         };
