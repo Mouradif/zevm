@@ -1,5 +1,5 @@
 const std = @import("std");
-const Status = @import("main.zig").Status;
+const Status = @import("interpreter.zig").Status;
 const GasTracker = @import("gas.zig").Tracker;
 const Hash = [32]u8;
 const Address = u160;

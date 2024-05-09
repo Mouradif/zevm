@@ -1,5 +1,5 @@
 const std = @import("std");
-const Status = @import("main.zig").Status;
+const Status = @import("interpreter.zig").Status;
 
 pub const StackErr = error{ Underflow, Overflow };
 
