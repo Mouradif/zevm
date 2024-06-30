@@ -19,7 +19,7 @@ Rust bindings will be provided for zEVM.
 
 ## Installing
 
-Built with [Zig](https://ziglang.org/download/) version `0.12.0`
+Built with [Zig](https://ziglang.org/download/) version `0.13.0`
 
 ``` text
 git clone https://github.com/rauljordan/zevm && cd zevm
