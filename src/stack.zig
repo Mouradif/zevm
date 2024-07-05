@@ -24,12 +24,18 @@ pub fn Stack(comptime T: type) type {
             return &self.inner.items[idx];
         }
         pub fn push(self: *This, x: T) !void {
+            if (self.inner.items.len == STACK_LIMIT) {
+                return Status.StackOverflow;
+            }
             return try self.inner.append(x);
         }
         pub fn pop(self: *This) T {
             return self.inner.pop();
         }
         pub fn swap(self: *This, idx: usize) !void {
+            if (self.inner.items.len < idx - 1) {
+                return Status.StackUnderflow;
+            }
             const removed = self.inner.swapRemove(idx - 1);
             return try self.inner.append(removed);
         }

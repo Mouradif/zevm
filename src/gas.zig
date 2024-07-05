@@ -4,6 +4,7 @@ pub const Tracker = struct {
     no_mem_used: u64,
     mem_used: u64,
     refunded: i64,
+
     pub fn init(gas_limit: u64) Tracker {
         return .{
             .limit = gas_limit,
@@ -13,6 +14,7 @@ pub const Tracker = struct {
             .refunded = 0,
         };
     }
+
     pub inline fn recordGasCost(self: *Tracker, cost: u64) bool {
         // Check if we overflow.
         const max_u64 = (1 << 64) - 1;

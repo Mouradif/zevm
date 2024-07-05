@@ -13,9 +13,8 @@ pub const Status = enum {
     StackOverflow,
 };
 
-
 pub const InterpreterError = error{
-DisallowedHostCall,
+    DisallowedHostCall,
 };
 
 pub const Interpreter = struct {
@@ -29,9 +28,9 @@ pub const Interpreter = struct {
     inst_result: Status,
     // TODO: Validate inputs.
     pub fn init(
-    alloc: std.mem.Allocator,
-    eth_host: host.Host,
-    bytecode: []u8,
+        alloc: std.mem.Allocator,
+        eth_host: host.Host,
+        bytecode: []u8,
     ) !This {
         return .{
             .ac = alloc,

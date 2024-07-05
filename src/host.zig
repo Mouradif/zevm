@@ -59,7 +59,8 @@ pub const TxEnv = struct {
     data: []u8,
     chain_id: ?u64,
     nonce: ?u64,
-    // TODO: Add access list?
+    // TODO: Add access list
+    // TODO: Add transient storage
     purpose: union(enum) {
         Call: Address,
         Create: CreateScheme,
@@ -141,6 +142,8 @@ pub const CallContext = struct {
     address: Address,
     /// Caller of the EVM.
     caller: Address,
+    /// Origin of the EVM.
+    origin: Address,
     /// The address the contract code was loaded from, if any.
     code_address: ?Address,
     /// Apparent value of the EVM.
